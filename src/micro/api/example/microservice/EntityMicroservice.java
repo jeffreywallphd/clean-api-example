@@ -2,7 +2,9 @@ package micro.api.example.microservice;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.json.simple.JSONObject;
 
@@ -42,17 +44,32 @@ public class EntityMicroservice extends Microservice {
 			System.out.println(e2.getMessage());
 			e2.printStackTrace();
 		}
+
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/MicroserviceTest","testuser", "password");
-			conn.close();
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			System.out.println(e1.getMessage());
 			e1.printStackTrace();
 		}
 		
+		Statement stmt;
 		
+		try {
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("select * from emp");  
+			
+			while(rs.next()) { 
+				System.out.println(rs.getInt(1)+"  "+rs.getString(2)+"  "+rs.getString(3));
+			}
+			
+			conn.close(); 
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}  
+		 
 		
 		JSONObject responseObject = new JSONObject();
 		

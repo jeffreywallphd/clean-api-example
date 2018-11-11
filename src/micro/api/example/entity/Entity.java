@@ -1,5 +1,7 @@
 package micro.api.example.entity;
 
-abstract public class Entity {
-	public Entity() {}
-}
+import org.json.simple.JSONObject;
+
+public abstract class Entity {
+	
+} 

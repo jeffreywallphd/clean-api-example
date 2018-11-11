@@ -1,0 +1,29 @@
+based on JSON api query and embedding of entities within the JSON query, 
+the APIGateway will treat embedded entities as a sequence and other entities as asynchronous calls
+
+Example
+
+{
+	get: {
+		University: {
+			universityId: {id: 123},
+			name,
+			President: {
+				personId,
+				name,
+				Secretary: {
+					personId,
+					name
+				}
+			},
+			Provost: {
+				personId,
+				name
+			}
+		},
+		City: [
+			{name,state}
+		]
+	}	
+}
+ 

@@ -1,0 +1,37 @@
+"{
+	\"method\": {			
+		\"get\":[
+			{
+				\"type\":\"University\",
+				\"attributes\":[\"name\"],
+				\"filter\": {
+					\"contains\": {\"name\":\"Tech\"},
+					\"limit\": 20,
+					\"offset\": 0
+				},									
+				\"relationships\": [{
+					\"type\":\"President\",
+					\"attributes\":[\"firstName\",\"lastName\"]						
+				}]			
+			},
+			{
+				\"type\":\"University\",
+				\"attributes\":[\"name\"],
+				\"filter\": {\"id\": 123}			
+			}
+		],
+		\"post\":[
+			{
+				\"type\":\"University\",
+				\"data\":{\"name\":\"Michigan Tech\"},						
+				\"relationships\": [{
+					\"type\":\"President\",
+					\"data\":{\"firstName\":\"Rick\",\"lastName\":\"Koubek\"}						
+				}]			
+			}	
+		]
+	}		
+}";
+
+
+"{\"method\": {\"get\":[{\"type\":\"University\",\"attributes\":[\"name\"],\"filter\": {\"contains\": {\"name\":\"Tech\"},\"limit\": 20,\"offset\": 0},\"relationships\": [{\"type\":\"President\",\"attributes\":[\"firstName\",\"lastName\"]}]},{\"type\":\"University\",\"attributes\":[\"name\"],\"filter\": {\"id\": 123}}],\"post\":[{\"type\":\"University\",\"data\":{\"name\":\"Michigan Tech\"},\"relationships\": [{\"type\":\"President\",\"data\":{\"firstName\":\"Rick\",\"lastName\":\"Koubek\"}}]}]}}";

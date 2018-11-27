@@ -34,4 +34,62 @@
 }";
 
 
+
+"{
+	\"method\": {			
+		\"get\":{
+			\"University\": {
+				\"attributes\":[\"name\"],
+				\"filter\": {
+					\"contains\": {\"name\":\"Tech\"},
+					\"limit\": 20,
+					\"offset\": 0
+				},									
+				\"President\": {
+					\"type\":\"President\",
+					\"attributes\":[\"firstName\",\"lastName\"]						
+				}			
+			},
+			\"Course\": {				
+				\"attributes\":[\"name\"],
+				\"filter\": {\"id\": 123}			
+			}
+		},
+		\"post\":{
+			\"University\": [
+				{
+					\"attributes\": {\"name\":\"Michigan Tech\"},						
+					\"President\": [
+						\"attributes\": {\"firstName\":\"Rick\",\"lastName\":\"Koubek\"}
+					]			
+				},
+				{
+					\"attributes\": {\"name\":\"Northern Michigan University\"},						
+					\"President\": [
+						\"attributes\": {\"firstName\":\"Unknown\",\"lastName\":\"Unknown\"}
+					]
+				}
+			]	
+		},
+		\"update\":{
+			\"University\": [
+				{
+					\"attributes\": {\"name\":\"Michigan Technological University\"},
+					\"filter\": {\"id\": 123}						
+					\"President\": [
+						\"attributes\": {\"firstName\":\"Rick\",\"lastName\":\"Koubek\"}
+					]			
+				}
+			]	
+		},
+		\"delete\":{
+			\"University\": [
+				{\"filter\": {\"id\": 123}}
+			]	
+		}
+	}		
+}";
+
+
+
 "{\"method\": {\"get\":[{\"type\":\"University\",\"attributes\":[\"name\"],\"filter\": {\"contains\": {\"name\":\"Tech\"},\"limit\": 20,\"offset\": 0},\"relationships\": [{\"type\":\"President\",\"attributes\":[\"firstName\",\"lastName\"]}]},{\"type\":\"University\",\"attributes\":[\"name\"],\"filter\": {\"id\": 123}}],\"post\":[{\"type\":\"University\",\"data\":{\"name\":\"Michigan Tech\"},\"relationships\": [{\"type\":\"President\",\"data\":{\"firstName\":\"Rick\",\"lastName\":\"Koubek\"}}]}]}}";

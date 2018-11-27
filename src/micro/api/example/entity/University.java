@@ -1,13 +1,23 @@
 package micro.api.example.entity;
 
+import java.util.HashMap;
+
 public class University extends Entity {
-	//class attributes
-	private int universityId;
-	private String universityName;
-	
+	//class attributes	
 	private int id = this.universityId;
+	private int universityId;
+	private String name;
+	
+	private HashMap<String,String> dataTypes = new HashMap();
 	
 	//getter-setter methods
+	public HashMap<String,String> getDataTypes() {		
+		this.dataTypes.put("universityId", "int");
+		this.dataTypes.put("name", "String");
+		
+		return this.dataTypes;
+	}
+	
 	public int universityId() {
 		return this.universityId;
 	}
@@ -16,12 +26,12 @@ public class University extends Entity {
 		this.universityId = fieldValue;
 	}
 	
-	public String universityName() {
-		return this.universityName;
+	public String name() {
+		return this.name;
 	}
 	
 	public void universityName(String fieldValue) {
-		this.universityName = fieldValue;
+		this.name = fieldValue;
 	}
 	
 	public int id() {

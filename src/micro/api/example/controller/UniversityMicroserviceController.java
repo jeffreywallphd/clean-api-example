@@ -1,5 +1,8 @@
 package micro.api.example.controller;
 
+import java.util.HashMap;
+import java.util.Set;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -30,29 +33,63 @@ public class UniversityMicroserviceController implements IMicroserviceController
 		JSONObject jsonRequest = (JSONObject) this.jsonRequestObject;		
 		JSONObject actions = (JSONObject) jsonRequest.get("method");
 		
-		//TODO if other types of microservices exist, create MircoserviceFactory
-		if(actions.containsKey("get")) { this.routeToMicroservice("get",actions.get("get")); }		
-		if(actions.containsKey("update")) { this.routeToMicroservice("update",actions.get("update")); }		
-		if(actions.containsKey("post")) { this.routeToMicroservice("post",actions.get("post")); }		
-		if(actions.containsKey("delete")) { this.routeToMicroservice("delete",actions.get("delete")); }
+		//TODO set up transactions for cases that require rollback
+		
+		//TODO if other types of non-CRUD microservices exist, create MircoserviceFactory
+		if(actions.containsKey("get")) { 
+			JSONObject getObject = (JSONObject) actions.get("get"); 
+			this.routeToMicroservice("get",getObject); }		
+		if(actions.containsKey("update")) { 
+			JSONObject updateObject = (JSONObject) actions.get("update");
+			this.routeToMicroservice("update",updateObject); }		
+		if(actions.containsKey("post")) { 
+			JSONObject postObject = (JSONObject) actions.get("post");
+			this.routeToMicroservice("post",postObject); }		
+		if(actions.containsKey("delete")) { 
+			JSONObject deleteObject = (JSONObject) actions.get("delete");
+			this.routeToMicroservice("delete",deleteObject); }
 								
 		return this.jsonResponseObject;
 	}
 	
-	private void routeToMicroservice(String method, Object actions) {
+	private void routeToMicroservice(String method, JSONObject methodObject) {
 		//TODO create a Router class and use that instead
-		JSONArray actionsArray = (JSONArray) actions;		
+		Set entityNames = methodObject.keySet(); 		
 		
-		for(Object action : actionsArray) {			
-			JSONObject actionObject = (JSONObject) action;
+		for(Object entityName : entityNames) {			
 			
-			EntityMicroservice microService = new EntityMicroservice(actionObject);
-			
-			//TODO create a response object
-			if(method=="get") { this.jsonResponseObject.put("toFix", microService.read()); }		
-			if(method=="update") { this.jsonResponseObject.put("toFix", microService.update()); }		
-			if(method=="post") { this.jsonResponseObject.put("toFix", microService.create()); }		
-			if(method=="delete") { this.jsonResponseObject.put("toFix", microService.delete()); }
+			if(methodObject.get(entityName) instanceof JSONObject) {
+				JSONObject entityObject = (JSONObject) methodObject.get(entityName);				
+				EntityMicroservice microService = new EntityMicroservice(entityObject);
+				
+				//TODO create a response object
+				if(method=="get") { 
+					this.jsonResponseObject.put("toFix", microService.read(entityName.toString())); }		
+				if(method=="update") { 
+					this.jsonResponseObject.put("toFix", microService.update(entityName.toString())); }		
+				if(method=="post") { 
+					this.jsonResponseObject.put("toFix", microService.create(entityName.toString())); }		
+				if(method=="delete") { 
+					this.jsonResponseObject.put("toFix", microService.delete(entityName.toString())); }
+			} else if(methodObject.get(entityName) instanceof JSONArray) {
+				
+				for(Object entityObject : (JSONArray) methodObject.get(entityName)) {
+					EntityMicroservice microService = new EntityMicroservice(entityObject);
+					
+					//TODO create a response object
+					if(method=="get") { 
+						this.jsonResponseObject.put("toFix", microService.read(entityName.toString())); }		
+					if(method=="update") { 
+						this.jsonResponseObject.put("toFix", microService.update(entityName.toString())); }		
+					if(method=="post") { 
+						this.jsonResponseObject.put("toFix", microService.create(entityName.toString())); }		
+					if(method=="delete") { 
+						this.jsonResponseObject.put("toFix", microService.delete(entityName.toString())); }
+				}
+				
+			} else {
+				//TODO throw exception
+			}						
 		}
 	}	
 }

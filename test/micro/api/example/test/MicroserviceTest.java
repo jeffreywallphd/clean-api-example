@@ -2,6 +2,7 @@ package micro.api.example.test;
 
 import static org.junit.Assert.*;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -25,8 +26,36 @@ public class MicroserviceTest {
 	
 	@Test
 	public void shouldCreateEntity() {
-		String requestModel = "{\"type\":\"University\",\"data\":{\"name\":\"Michigan Tech\"},\"relationships\": [{\"type\":\"President\",\"data\":{\"firstName\":\"Rick\",\"lastName\":\"Koubek\"}}]}";
+		//TODO not accepting arrays and later objects. Need to create a loop somewhere
+		String requestModel = "[{\"name\":\"Michigan Tech\",\"President\":{\"firstName\":\"Rick\",\"lastName\":\"Koubek\"}}]";
 		
+		JSONParser parser = new JSONParser();
+		JSONArray requestModelObject = null;
+		
+		try {			
+			requestModelObject = (JSONArray) parser.parse(requestModel);
+		} catch (ParseException e) {
+			System.out.println(e.getMessage());
+			fail("Failed to parse request model for the following reason: " + e.getMessage());
+			e.printStackTrace();
+		}
+		
+		EntityMicroservice microservice = new EntityMicroservice(requestModelObject);
+		
+		String responseModel = "{\"University\":{\"data\":[{\"code\":200,\"id\":1}],\"President\":[{\"data\":[{\"code\":200,\"id\":1}]}}";
+		
+		try {
+			System.out.println(microservice.create("University").toString());
+			assertEquals(responseModel,microservice.create("University").toString());
+		}catch(Exception e) {			
+			fail("Response does not match for the following reason: " + e.getMessage());
+		}		
+	}
+	
+	@Test
+	public void shouldReadEntity() {
+		String requestModel = "{\"attributes\":[\"name\"],\"filter\": {\"contains\": {\"name\":\"Tech\"},\"limit\": 20,\"offset\": 0},\"President\":{\"attributes\":[\"firstName\",\"lastName\"]}}";
+				
 		JSONParser parser = new JSONParser();
 		JSONObject requestModelObject = null;
 		
@@ -40,18 +69,14 @@ public class MicroserviceTest {
 		
 		EntityMicroservice microservice = new EntityMicroservice(requestModelObject);
 		
-		String responseModel = "{\"type\":\"University\",\"data\":[{\"code\":200,\"id\":1}],\"relationships\":[{\"type\":\"President\",\"data\":[{\"code\":200,\"id\":1}]}]}";
+		String responseModel = "{\"University\":[{}]}";
 		
 		try {
-			assertEquals(responseModel,microservice.create().toString());
-		}catch(Exception e) {
+			System.out.println(microservice.read("University").toString());
+			assertEquals(responseModel,microservice.read("University").toString());
+		}catch(Exception e) {			
 			fail("Response does not match for the following reason: " + e.getMessage());
-		}		
-	}
-	
-	@Test
-	public void shouldReadEntity() {
-		String requestModel = "{\"get\":[{\"type\":\"University\",\"attributes\":[\"name\"],\"filter\": {\"contains\": {\"name\":\"Tech\"},\"limit\": 20,\"offset\": 0},\"relationships\": [{\"type\":\"President\",\"attributes\":[\"firstName\",\"lastName\"]}]},{\"entity\":\"University\",\"attributes\":[\"name\"],\"filter\": {\"id\": 123}}]}]}";
+		}
 	}
 	
 	@Test
@@ -62,8 +87,7 @@ public class MicroserviceTest {
 	@Test
 	public void shouldDeleteEntity() {
 		
-	}
-	
+	}	
 	
 	@Test
 	public void shouldPerformMethods() {

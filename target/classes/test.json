@@ -40,19 +40,18 @@
 		\"get\":{
 			\"University\": {
 				\"attributes\":[\"name\"],
-				\"filter\": {
+				\"filters\": {
 					\"contains\": {\"name\":\"Tech\"},
 					\"limit\": 20,
 					\"offset\": 0
 				},									
 				\"President\": {
-					\"type\":\"President\",
 					\"attributes\":[\"firstName\",\"lastName\"]						
 				}			
 			},
 			\"Course\": {				
 				\"attributes\":[\"name\"],
-				\"filter\": {\"id\": 123}			
+				\"filters\": {\"id\": 123}			
 			}
 		},
 		\"post\":{
@@ -60,13 +59,13 @@
 				{
 					\"attributes\": {\"name\":\"Michigan Tech\"},						
 					\"President\": [
-						\"attributes\": {\"firstName\":\"Rick\",\"lastName\":\"Koubek\"}
+						{\"attributes\": {\"firstName\":\"Rick\",\"lastName\":\"Koubek\"}}
 					]			
 				},
 				{
 					\"attributes\": {\"name\":\"Northern Michigan University\"},						
 					\"President\": [
-						\"attributes\": {\"firstName\":\"Unknown\",\"lastName\":\"Unknown\"}
+						{\"attributes\": {\"firstName\":\"Unknown\",\"lastName\":\"Unknown\"}}
 					]
 				}
 			]	
@@ -75,17 +74,17 @@
 			\"University\": [
 				{
 					\"attributes\": {\"name\":\"Michigan Technological University\"},
-					\"filter\": {\"id\": 123}						
+					\"filters\": {\"id\": 123}						
 					\"President\": [
-						\"attributes\": {\"firstName\":\"Rick\",\"lastName\":\"Koubek\"}
+						{\"attributes\": {\"firstName\":\"Rick\",\"lastName\":\"Koubek\"}}
 					]			
 				}
 			]	
 		},
 		\"delete\":{
-			\"University\": [
-				{\"filter\": {\"id\": 123}}
-			]	
+			\"University\": {
+				\"filters\": {\"id\": 123}
+			}	
 		}
 	}		
 }";
@@ -93,3 +92,21 @@
 
 
 "{\"method\": {\"get\":[{\"type\":\"University\",\"attributes\":[\"name\"],\"filter\": {\"contains\": {\"name\":\"Tech\"},\"limit\": 20,\"offset\": 0},\"relationships\": [{\"type\":\"President\",\"attributes\":[\"firstName\",\"lastName\"]}]},{\"type\":\"University\",\"attributes\":[\"name\"],\"filter\": {\"id\": 123}}],\"post\":[{\"type\":\"University\",\"data\":{\"name\":\"Michigan Tech\"},\"relationships\": [{\"type\":\"President\",\"data\":{\"firstName\":\"Rick\",\"lastName\":\"Koubek\"}}]}]}}";
+
+//return value for create entity
+{
+	\"University\":[
+		{
+			\"id\":1, 
+			\"code\":200, 
+			\"message\": \"Created 1 new entity(ies)\", 
+			\"President\":[
+				{
+					\"code\":200, 
+					\"message\": \"Created 1 new entity(ies)\", 
+					\"id\":1
+				}
+			]
+		}
+	]
+}

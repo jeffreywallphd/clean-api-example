@@ -5,10 +5,10 @@ import org.json.simple.JSONObject;
 import micro.api.example.entity.Entity;
 
 public interface IEntityGateway {
-	public void connect(String connectionString);
+	public void connect();
 	public void disconnect();
 	public Object create(Entity entity, JSONObject queryData);
 	public Object read(JSONObject queryData);
-	public Object update(JSONObject queryData);
-	public Object delete(JSONObject queryData);
+	public boolean update(JSONObject queryData);
+	public boolean delete(JSONObject queryData);
 }

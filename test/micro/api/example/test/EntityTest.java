@@ -22,10 +22,10 @@ public class EntityTest {
 		try {
 			University uni = new University();
 			uni.universityId(1);
-			uni.universityName("Michigan Technological University");
+			uni.name("Michigan Technological University");
 			
 			assertEquals(1,uni.universityId());
-			assertEquals("Michigan Technological University",uni.universityName());
+			assertEquals("Michigan Technological University",uni.name());
 		} catch(Exception e) {
 			fail("Failed to store entity attributes correctly for the following reason: " + e.getMessage());
 		}

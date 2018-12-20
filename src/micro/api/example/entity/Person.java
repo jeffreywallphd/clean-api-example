@@ -7,9 +7,7 @@ public class Person extends Entity {
 	private int personId;
 	private String firstName;
 	private String lastName;
-	private int universityId;
-	
-	private String primaryKey = "personId";
+	private int universityId;	
 	
 	public int personId() {
 		return this.personId;
@@ -52,5 +50,7 @@ public class Person extends Entity {
 	}
 	
 	//constructor
-	public Person() {}
+	public Person() {
+		this.primaryKey = "personId";
+	}
 }

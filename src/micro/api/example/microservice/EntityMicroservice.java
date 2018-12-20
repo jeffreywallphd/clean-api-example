@@ -22,10 +22,6 @@ public class EntityMicroservice extends Microservice {
 		this.jsonActionObject = (JSONObject) actionObject;	
 	}
 	
-	public void populateEntity(Entity entity, JSONObject requestModel) {
-		
-	}
-	
 	public JSONObject create(String entityName) {		
 		EntityFactory factory = new EntityFactory();
 		Entity entity = null;
@@ -61,7 +57,7 @@ public class EntityMicroservice extends Microservice {
 			}
 			
 			//validate data
-			entity.validate(this.jsonActionObject); 		
+			entity.populateAndValidate(this.jsonActionObject); 		
 		} catch(Exception e) {
 			//TODO add data validation error
 			System.out.println("Failed to validate the entity data!");

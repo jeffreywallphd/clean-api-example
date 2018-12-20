@@ -1,6 +1,8 @@
 package micro.api.example.gateway;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -85,6 +87,7 @@ public class MySQLEntityGateway implements IEntityGateway {
 			
 			int fieldCount = 0;
 			
+			//move getting allowed field names logic to entity
 			for(int i=0; i<fields.length; i++) {
 				Field field = fields[i];
 				String fieldName = field.getName().toString();
@@ -97,12 +100,8 @@ public class MySQLEntityGateway implements IEntityGateway {
 										
 					field.setAccessible(true);					
 					
-					Object fieldValue = field.get(entity);
-					
-					System.out.println(field.getName().toString()+" has value of: " + fieldValue);
-					
 					fieldNamesArray.add(fieldName);
-					fieldValuesArray.add(fieldValue);
+					fieldValuesArray.add(field.get(entity));
 					
 					fieldsString += "`" + fieldName + "`";
 					valuesString += "?";
@@ -115,7 +114,8 @@ public class MySQLEntityGateway implements IEntityGateway {
 			valuesString += ")";
 			
 			queryString += fieldsString + valuesString;
-			System.out.println("query string: "+queryString);
+			
+			System.out.println("query string: "+queryString); //TODO remove after testing
 		} catch(Exception e) {
 			//TODO throw exception for failing reflection
 			System.out.println("Error: "+e.getMessage());
@@ -129,33 +129,32 @@ public class MySQLEntityGateway implements IEntityGateway {
 						
 			int parameterIteration = 1;
 						
-			for(int i=0; i<fields.length; i++) {
-				Field field = fields[i];
-				String fieldName = field.getName().toString();
+			for(int i=0; i<fieldNamesArray.size(); i++) {
+				String field = fieldNamesArray.get(i);
+				Method method;
 				
-				if(!fieldName.equals(entity.primaryKey())) {
-					//TODO set to data type of particular field
-					
-					field.setAccessible(true);
-					
-					String fieldType = field.getGenericType().toString();
-					
-					System.out.println(field.getName().toString());
-					
-					if(fieldType.equals("class java.lang.String")) {
-						System.out.println("String is: " + fieldValuesArray.get(i).toString());
-						createEntity.setString(parameterIteration, fieldValuesArray.get(i).toString()); }					
-					else if(fieldType.equals("int")) {
-						System.out.println("Integer is: " + (int) fieldValuesArray.get(i));
-						createEntity.setInt(parameterIteration, (int) fieldValuesArray.get(i)); } 
-					else {
-						System.out.println(field.getName().toString() + " is of an unsupported data type");
-						return false;
-					}
-					//TODO add other data types					
-					
-					parameterIteration++;
+				try {
+					method = entity.getClass().getMethod(field);
+				} catch (NoSuchMethodException | SecurityException e) {
+					// TODO Auto-generated catch block
+					return false;
 				}
+				
+				String fieldType = method.getReturnType().toString(); 
+				
+				if(fieldType.equals("class java.lang.String")) {
+					System.out.println("String is: "+fieldValuesArray.get(i).toString());
+					createEntity.setString(parameterIteration, fieldValuesArray.get(i).toString()); }					
+				else if(fieldType.equals("int")) {
+					System.out.println("Integer is: " + (int) fieldValuesArray.get(i));
+					createEntity.setInt(parameterIteration, (int) fieldValuesArray.get(i)); } 
+				else {
+					System.out.println(field + " is of an unsupported data type");
+					return false;
+				}
+				//TODO add other data types					
+				
+				parameterIteration++;
 			}
 			
 			createEntity.execute();

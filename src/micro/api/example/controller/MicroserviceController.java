@@ -10,6 +10,8 @@ import org.json.simple.parser.ParseException;
 
 import micro.api.example.microservice.EntityMicroservice;
 
+//TODO create configurator to configure the MicoserviceController, Microservice, and other classes
+
 public class MicroserviceController implements IMicroserviceController {
 	private JSONObject jsonRequestObject;
 	private JSONObject jsonResponseObject;

@@ -32,5 +32,7 @@ public class University extends Entity {
 	}
 	
 	//constructor
-	public University () {}
+	public University () {
+		this.primaryKey = "universityId";		
+	}
 }

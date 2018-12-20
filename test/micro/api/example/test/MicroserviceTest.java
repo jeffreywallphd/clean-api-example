@@ -104,7 +104,7 @@ public class MicroserviceTest {
 		EntityMicroservice microservice = new EntityMicroservice(requestModelObject);
 		
 		String responseModel = "{\"code\":201,\"id\":1,\"message\":\"Created\",\"Person\":[{\"code\":201,\"id\":1,\"message\":\"Created\"},{\"code\":201,\"id\":2,\"message\":\"Created\"}]}";
-		String responseActual = microservice.create("University").toString();
+		String responseActual = microservice.create("University").toJSONString();
 		
 		try {
 			assertEquals(responseModel,responseActual);

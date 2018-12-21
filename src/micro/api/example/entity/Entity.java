@@ -7,35 +7,47 @@ import java.util.ArrayList;
 import org.json.simple.JSONObject;
 
 public abstract class Entity {
-	protected String primaryKey;
+	protected String[] protectedMethods = {"id","populateAndValidate","hasAttribute","getAttributes","primaryKey"};
 	
+	protected String primaryKey;	
 	public String primaryKey() {
 		return this.primaryKey;
 	}
 	
+	public abstract int id();	
+	public abstract void id(int fieldValue);
+	
 	public boolean populateAndValidate(JSONObject requestObject) {
+		ArrayList<String> protectedMethods = new ArrayList(); //TODO find a way to use whitelist instead of blacklist
+		//protected entity methods
+		protectedMethods.add("id");
+		protectedMethods.add("populateAndValidate");
+		protectedMethods.add("hasAttribute");
+		protectedMethods.add("getAttributes");
+		protectedMethods.add("primaryKey");
+		//protected object methods
+		protectedMethods.add("wait");
+		protectedMethods.add("equals");
+		protectedMethods.add("toString");
+		protectedMethods.add("hashCode");
+		protectedMethods.add("getClass");
+		protectedMethods.add("notify");
+		protectedMethods.add("notifyAll");
+		
 		try {
-			//determine valid fields within entity
-			Field[] fields = this.getAttributes();
-			
-			ArrayList<String> allowedFields = new ArrayList<String>();
-			
-			for(Field field: fields) {
-				String fieldName = field.getName().toString();
-				
-				if(!fieldName.equals(primaryKey) & !fieldName.equals(this.primaryKey())) {
-					allowedFields.add(fieldName);					
-				}
-			}
-			
 			//invoke setter methods for each field
 			Method[] methods = this.getClass().getMethods();
 			
 			JSONObject attributes = (JSONObject) requestObject.get("attributes");
-						
+			
+			System.out.println(attributes.toJSONString());
+			
 			for(Method method: methods) {
-				
-				if(allowedFields.contains(method.getName().toString()) && method.getParameterCount()>0) {																	
+				System.out.println("The current method is: "+method.getName().toString());
+				if(!protectedMethods.contains(method.getName().toString()) 
+						&& method.getParameterCount()>0 
+						&& attributes.get(method.getName().toString()) != null) {
+					System.out.println("method name is: "+method.getName().toString());
 					method.invoke(this, attributes.get(method.getName().toString()));
 				}
 			}

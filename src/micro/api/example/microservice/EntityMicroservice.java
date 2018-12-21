@@ -22,7 +22,7 @@ public class EntityMicroservice extends Microservice {
 		this.jsonActionObject = (JSONObject) actionObject;	
 	}
 	
-	public JSONObject create(String entityName) {		
+	public JSONObject create(String entityName) {
 		EntityFactory factory = new EntityFactory();
 		Entity entity = null;
 			
@@ -68,7 +68,7 @@ public class EntityMicroservice extends Microservice {
 		MySQLEntityGateway gateway;
 		
 		try {
-			//TODO inject connection string
+			//TODO configure connection string through configurator
 			gateway = new MySQLEntityGateway("jdbc:mysql://localhost:3306","MicroserviceTest");
 			gateway.connect();			
 		} catch(Exception e) {
@@ -79,61 +79,76 @@ public class EntityMicroservice extends Microservice {
 		
 		//process data results
 		gateway.setEntity(entityName);		
+		
 		ResultSet results;
+		
+		int newEntityId;
 		
 		try {
 			results = (ResultSet) gateway.create(entity,this.jsonActionObject);
 			results.next();
-			int newEntityId = results.getInt(1);
 			
-			try {												
-				responseObject.put("id", newEntityId);
-				responseObject.put("code", 201);
-				responseObject.put("message", "Created");
-				
-				//check for embedded entities
-				Set properties = this.jsonActionObject.keySet();			
-				
-				for(Object property: properties) {
-					//process embedded entities
-					try {										
-						if(property.equals("attributes") || property.equals("filters")) {						
-							//ignore attributes and filters
-						} else {
-							JSONArray dataArray = new JSONArray();
-							
-							if(this.jsonActionObject.get(property) instanceof JSONArray) {
-								JSONArray embeddedArray = (JSONArray) this.jsonActionObject.get(property);
-																						
-								for(Object embeddedEntity: embeddedArray) {				
-									EntityMicroservice embeddedMicroService = new EntityMicroservice(embeddedEntity);
-									dataArray.add(embeddedMicroService.create(property.toString()));
-								}
-							
-							} else if(this.jsonActionObject.get(property) instanceof JSONObject) {
-								EntityMicroservice embeddedMicroService = new EntityMicroservice(this.jsonActionObject.get(property));
-								dataArray.add(embeddedMicroService.create(property.toString()));
-							}
-							
-							responseObject.put(property,dataArray);
-						}
-					} catch(Exception e1) {
-						//TODO add embedded entity error
-						System.out.println("Failed to create embedded entity " + e1.getMessage());
-					}
-				}			
-					
-				return responseObject;
-			} catch(Exception e) {
-				//TODO add database select error
-				System.out.println("Failed to create a new entity! " + e.getMessage());
-				return responseObject;
-			}
+			newEntityId = results.getInt(1); //TODO fix so that accepts other types of Ids beyond integers
+			
+			entity.id(newEntityId);
+			
+			responseObject.put("id", newEntityId);
+			responseObject.put("code", 201);
+			responseObject.put("message", "Created");
+			System.out.println("finished microservice request for "+entityName);
 		} catch (SQLException e2) {
 			System.out.println("Failed to execute entity creation! " + e2.getMessage());
 			// TODO add database select error
 			return responseObject;	
-		}											 								
+		}
+		
+		//check for embedded entities
+		Set properties = this.jsonActionObject.keySet();			
+			
+		for(Object property: properties) {
+			//process embedded entities
+			if(property.equals("attributes") || property.equals("filters")) {						
+				//ignore attributes and filters
+			} else {							
+				JSONArray dataArray = new JSONArray();
+				
+				if(this.jsonActionObject.get(property) instanceof JSONArray) {
+					JSONArray embeddedArray = (JSONArray) this.jsonActionObject.get(property);
+																			
+					for(Object embeddedElement: embeddedArray) {
+						try {							
+							JSONObject embeddedObject = (JSONObject) embeddedElement;									
+							JSONObject embeddedAttributes = (JSONObject) embeddedObject.get("attributes");
+							embeddedAttributes.put(entityName,newEntityId); //assumes foreign key exists in embedded entity
+							
+							EntityMicroservice embeddedMicroService = new EntityMicroservice(embeddedObject);
+							dataArray.add(embeddedMicroService.create(property.toString())); //add embedded entity results to data array
+						} catch(Exception e) {
+							System.out.println("Failed to create embedded entity " + property.toString()+ "; " + e.getMessage());
+							return responseObject;
+						}
+					}
+					
+				} else if(this.jsonActionObject.get(property) instanceof JSONObject) {	
+					try {							
+						JSONObject embeddedObject = (JSONObject) this.jsonActionObject.get(property);
+						JSONObject embeddedAttributes = (JSONObject) embeddedObject.get("attributes");
+						embeddedAttributes.put(entityName,newEntityId); //assumes foreign key exists in embedded entity
+						
+						EntityMicroservice embeddedMicroService = new EntityMicroservice(embeddedObject);
+						dataArray.add(embeddedMicroService.create(property.toString())); //add embedded entity results to data array
+					} catch(Exception e) {
+						//TODO add embedded entity error
+						System.out.println("Failed to create embedded entity " + property.toString()+ "; " + e.getMessage());
+						return responseObject;	
+					}
+				}
+				
+				responseObject.put(property,dataArray);
+			}				
+		}
+	
+		return responseObject;
 	}
 	
 	public Object read(String entityName) {

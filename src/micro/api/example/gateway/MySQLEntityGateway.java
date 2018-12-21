@@ -100,6 +100,8 @@ public class MySQLEntityGateway implements IEntityGateway {
 										
 					field.setAccessible(true);					
 					
+					System.out.println(fieldName+" equals "+field.get(entity));
+					
 					fieldNamesArray.add(fieldName);
 					fieldValuesArray.add(field.get(entity));
 					
@@ -119,7 +121,7 @@ public class MySQLEntityGateway implements IEntityGateway {
 		} catch(Exception e) {
 			//TODO throw exception for failing reflection
 			System.out.println("Error: "+e.getMessage());
-			return false;
+			return null;
 		}
 		
 		PreparedStatement createEntity = null;
@@ -137,7 +139,7 @@ public class MySQLEntityGateway implements IEntityGateway {
 					method = entity.getClass().getMethod(field);
 				} catch (NoSuchMethodException | SecurityException e) {
 					// TODO Auto-generated catch block
-					return false;
+					return null;
 				}
 				
 				String fieldType = method.getReturnType().toString(); 
@@ -150,7 +152,7 @@ public class MySQLEntityGateway implements IEntityGateway {
 					createEntity.setInt(parameterIteration, (int) fieldValuesArray.get(i)); } 
 				else {
 					System.out.println(field + " is of an unsupported data type");
-					return false;
+					return null;
 				}
 				//TODO add other data types					
 				
@@ -167,7 +169,7 @@ public class MySQLEntityGateway implements IEntityGateway {
 			System.out.println("Failed to execute the insert query!");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return false;
+			return null;
 		}		
 	}
 

@@ -33,12 +33,21 @@ public class Person extends Entity {
 		this.lastName = fieldValue;
 	}
 	
-	public int University() {
+	public int universityId() {
 		return this.universityId;
 	}
 	
-	public void University(int fieldValue) {
+	public void universityId(int fieldValue) {
 		this.universityId = fieldValue;
+	}
+	
+	//call foreign key by name of foreign entity
+	public int University() {
+		return this.universityId();
+	}
+	
+	public void University(int fieldValue) {
+		this.universityId(fieldValue);
 	}
 	
 	public int id() {
